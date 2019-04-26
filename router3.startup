@@ -2,6 +2,10 @@ ifconfig eth0 5.4.3.254/24 up
 ifconfig eth1 6.6.6.2/24 up
 ip route add 0.0.0.0/0 via 6.6.6.1
 /etc/init.d/ssh start
-source /usr/share/doc/openvpn/examples/easy-rsa/2.0/vars
-/usr/share/doc/openvpn/examples/easy-rsa/2.0/clean-all
-/usr/share/doc/openvpn/examples/easy-rsa/2.0/build-ca
+cd /usr/share/doc/openvpn/examples/easy-rsa/2.0
+source ./vars
+./clean-all
+echo -en "US\nCA\nSanFrancisco\nSECTEC\nSECTEC_SF\nrouter3\n\n" | ./build-ca
+echo -en "US\nCA\nSanFrancisco\nSECTEC\nSECTEC_SF\nrouter3\n\n1234\n\ny\ny\n" | ./build-key client1
+./build-dh
+
