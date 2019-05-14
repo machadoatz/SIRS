@@ -3,4 +3,5 @@ ifconfig eth1 6.6.6.1/24 up
 ip route add 1.2.0.0/20 via 1.2.2.2
 ip route add 0.0.0.0/0 via 6.6.6.2
 
-/etc/init.d/openvpn
+/etc/init.d/openvpn start
+ip route add 5.4.3.0/24 via 200.200.200.2
