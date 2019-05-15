@@ -11,29 +11,29 @@ ifconfig br0 up
 # nota, no packet-filter há problemas com as interfaces, portanto nao usamos -i -o
 iptables --policy FORWARD DROP
 
-# permitir ssh da rede S.F. para o web server
-iptables -A FORWARD -s 1.2.3.1 -d 5.4.3.0/24 -p TCP --sport ssh -j ACCEPT
-iptables -A FORWARD -s 5.4.3.0/24 -d 1.2.3.1 -p TCP --dport ssh -j ACCEPT
-# ssh da rede de SF para file-server
-iptables -A FORWARD -s 5.4.3.0/24 -d 1.2.4.55 -p TCP --dport ssh -j ACCEPT
-iptables -A FORWARD -d 5.4.3.0/24 -s 1.2.4.55 -p TCP --sport ssh -j ACCEPT
-
-# internet tem acesso ao web-server
-iptables -A FORWARD -s 1.2.3.1 -p TCP --sport 80 -j ACCEPT
-iptables -A FORWARD -d 1.2.3.1 -p TCP --dport 80 -j ACCEPT
-# DMZ tem acesso a web da internet
-iptables -A FORWARD -s 1.2.3.0/24 -p TCP --dport 80 -j ACCEPT
-iptables -A FORWARD -d 1.2.3.0/24 -p TCP --sport 80 -j ACCEPT
-#--dport 80 e --sport 80?
-
-# internet tem acesso ao mail server
-iptables -A FORWARD -s 1.2.3.2 -p TCP --sport 587 -j ACCEPT
-iptables -A FORWARD -d 1.2.3.2 -p TCP --dport 587 -j ACCEPT
-# DMZ tem acesso ao mail da internet
-iptables -A FORWARD -s 1.2.3.0/24 -p TCP --dport 587 -j ACCEPT
-iptables -A FORWARD -d 1.2.3.0/24 -p TCP --sport 587 -j ACCEPT
-
 # ICMP
 iptables -A FORWARD -s 1.2.0.0/20 -p ICMP -j ACCEPT
 iptables -A FORWARD -d 1.2.0.0/20 -p ICMP -j ACCEPT
+
+# SF tem acesso a ssh da rede
+iptables -A FORWARD -s 5.4.3.0/24 -d 1.2.0.0/20 -p TCP --dport 22 -j ACCEPT
+iptables -A FORWARD -s 1.2.0.0/20 -d 5.4.3.0/24 -p TCP --sport 22 -j ACCEPT
+# rede tem acesso a ssh da internet
+iptables -A FORWARD -s 1.2.0.0/20 -p TCP --dport 22 -j ACCEPT
+iptables -A FORWARD -d 1.2.0.0/20 -p TCP --sport 22 -j ACCEPT
+
+# internet e SF tem acesso a web server
+iptables -A FORWARD -d 1.2.0.0/20 -p TCP --dport 80 -j ACCEPT
+iptables -A FORWARD -s 1.2.0.0/20 -p TCP --sport 80 -j ACCEPT
+# rede tem acesso a web da internet
+iptables -A FORWARD -s 1.2.0.0/20 -p TCP --dport 80 -j ACCEPT
+iptables -A FORWARD -d 1.2.0.0/20 -p TCP --sport 80 -j ACCEPT
+
+# internet e SF tem acesso ao mail server
+iptables -A FORWARD -d 1.2.0.0/20 -p TCP --dport 587 -j ACCEPT
+iptables -A FORWARD -s 1.2.0.0/20 -p TCP --sport 587 -j ACCEPT
+# rede tem acesso ao mail da internet
+iptables -A FORWARD -s 1.2.0.0/20 -p TCP --dport 587 -j ACCEPT
+iptables -A FORWARD -d 1.2.0.0/20 -p TCP --sport 587 -j ACCEPT
+
 
