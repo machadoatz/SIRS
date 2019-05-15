@@ -12,17 +12,28 @@ iptables -A FORWARD -s 5.4.3.0/24 -d 1.2.3.1 -i eth0 -p TCP --dport ssh -j ACCEP
 # web server has ssh access to corporate SF and LX
 iptables -A FORWARD -s 1.2.3.1 -d 1.2.4.0/24 -i eth1 -p TCP --sport ssh -j ACCEPT
 iptables -A FORWARD -s 1.2.3.1 -d 5.4.3.0/24 -i eth1 -p TCP --sport ssh -j ACCEPT
+# SF has access to file-server
+iptables -A FORWARD -s 5.4.3.0/24 -d 1.2.4.55 -i eth0 -p TCP --dport ssh -j ACCEPT
+iptables -A FORWARD -d 5.4.3.0/24 -s 1.2.4.55 -i eth2 -p TCP --sport ssh -j ACCEPT
+
+# corporate SF and LX have web access to web server
+iptables -A FORWARD -s 1.2.4.0/24 -d 1.2.3.1 -i eth2 -p TCP --dport 80 -j ACCEPT
+iptables -A FORWARD -s 5.4.3.0/24 -d 1.2.3.1 -i eth0 -p TCP --dport 80 -j ACCEPT
+# web server has web access to corporate SF and LX
+iptables -A FORWARD -s 1.2.3.1 -d 1.2.4.0/24 -i eth1 -p TCP --sport 80 -j ACCEPT
+iptables -A FORWARD -s 1.2.3.1 -d 5.4.3.0/24 -i eth1 -p TCP --sport 80 -j ACCEPT
 
 # internet has access to mail server
 iptables -A FORWARD -s 1.2.3.2 -i eth1 -p TCP --sport 587 -j ACCEPT
 iptables -A FORWARD -d 1.2.3.2 -o eth1 -p TCP --dport 587 -j ACCEPT
+# internet has access to web server
+iptables -A FORWARD -s 1.2.3.1 -i eth1 -p TCP --sport 80 -j ACCEPT
+iptables -A FORWARD -d 1.2.3.1 -o eth1 -p TCP --dport 80 -j ACCEPT
 # DMZ has access to internet mail
 iptables -A FORWARD -s 1.2.3.0/24 -i eth1 -p TCP --dport 587 -j ACCEPT
 iptables -A FORWARD -d 1.2.3.0/24 -i eth0 -p TCP --sport 587 -j ACCEPT
 
 # ICMP
-iptables -A FORWARD -s 1.2.0.0/20 -d 1.2.0.0/20 -p ICMP -j ACCEPT
-iptables -A FORWARD -s 5.4.3.0/24 -d 1.2.0.0/20 -i eth0 -p ICMP -j ACCEPT
-iptables -A FORWARD -s 1.2.0.0/20 -d 5.4.3.0/24 -o eth0 -p ICMP -j ACCEPT
-#iptables -A FORWARD -s 200.200.200.0/24 -d 1.2.0.0/20 -i eth0 -p ICMP -j ACCEPT
-#iptables -A FORWARD -s 1.2.0.0/20 -d 200.200.200.0/24 -o eth0 -p ICMP -j ACCEPT
+iptables -A FORWARD -s 1.2.0.0/20 -p ICMP -j ACCEPT
+iptables -A FORWARD -d 1.2.0.0/20 -p ICMP -j ACCEPT
+
